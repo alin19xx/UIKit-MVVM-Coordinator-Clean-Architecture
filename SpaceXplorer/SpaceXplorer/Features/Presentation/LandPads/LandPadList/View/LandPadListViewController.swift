@@ -10,7 +10,6 @@ import UIKit
 
 class LandPadListViewController: BaseViewController<DefaultLandPadListViewModel> {
 
-//    var viewModel: LandPadListViewModel = DefaultLandPadListViewModel()
     var mainCoordinator: MainCoordinator?
     
     private(set) var tableView: UITableView = {
@@ -58,8 +57,6 @@ class LandPadListViewController: BaseViewController<DefaultLandPadListViewModel>
         view.addSubview(tableView)
         
         setupTableView()
-        setupNavigationBar()
-        
         setupConstraints()
     }
     
@@ -68,24 +65,6 @@ class LandPadListViewController: BaseViewController<DefaultLandPadListViewModel>
         tableView.dataSource = dataSource
         
         dataSource.registerCells()
-    }
-    
-    private func setupNavigationBar() {
-        let filterMenu = UIMenu(title: "Filter Options", children: [
-//            UIAction(title: "All", image: UIImage(systemName: "list.bullet")) { [weak self] _ in
-//                self?.viewModel.filterLaunches(type: .all)
-//            },
-//            UIAction(title: "Past", image: UIImage(systemName: "clock.arrow.circlepath")) { [weak self] _ in
-//                self?.viewModel.filterLaunches(type: .past)
-//            },
-//            UIAction(title: "Upcoming", image: UIImage(systemName: "clock")) { [weak self] _ in
-//                self?.viewModel.filterLaunches(type: .upcoming)
-//            }
-        ])
-        
-        let filterButton = UIBarButtonItem(title: "Filter", image: UIImage(systemName: "line.3.horizontal.decrease.circle"), primaryAction: nil, menu: filterMenu)
-        
-        navigationItem.rightBarButtonItem = filterButton
     }
 
     private func setupConstraints() {

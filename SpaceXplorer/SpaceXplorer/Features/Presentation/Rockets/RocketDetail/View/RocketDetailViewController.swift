@@ -66,6 +66,8 @@ class RocketDetailViewController: UIViewController {
     // MARK: - View Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .white
+        
         setupNavigationBar()
         setupView()
     }

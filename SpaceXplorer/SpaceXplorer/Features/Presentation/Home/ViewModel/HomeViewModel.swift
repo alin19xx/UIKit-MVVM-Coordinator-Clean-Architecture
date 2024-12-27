@@ -26,6 +26,6 @@ final class DefaultHomeViewModel: HomeViewModel {
     init() {}
     
     func viewDidLoad() {
-        sections.value = [.rockets, .dragons, .landpads, .launches]
+        sections.value = [.rockets, .landpads, .launches, .starlink]
     }
 }

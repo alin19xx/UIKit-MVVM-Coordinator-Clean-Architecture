@@ -19,11 +19,11 @@ final class RocketListDataSource: NSObject, UITableViewDataSource {
     }
     
     func registerCells() {
-        tableview.register(cellType: RocketTableViewCell.self)
+        tableview.register(cellType: BaseDetailTableViewCell.self)
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel?.model.value?.count ?? 0 // Usar `model` en lugar de `allLaunches`
+        return viewModel?.model.value?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -31,8 +31,8 @@ final class RocketListDataSource: NSObject, UITableViewDataSource {
             return UITableViewCell()
         }
         
-        let cell: RocketTableViewCell = tableView.dequeueReusableCell(for: indexPath)
-        cell.configureWith(model: rocket)
+        let cell: BaseDetailTableViewCell = tableView.dequeueReusableCell(for: indexPath)
+        cell.configureWith(title: rocket.name, image: rocket.images[0])
         cell.selectionStyle = .none
         
         return cell

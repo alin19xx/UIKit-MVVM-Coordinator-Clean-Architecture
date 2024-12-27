@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-final class LaunchesDataSource: NSObject, UITableViewDataSource {
+final class LaunchesDataSource: NSObject, UITableViewDataSource, UITableViewDataSourcePrefetching {
     
     private let tableview: UITableView
     private var viewModel: LaunchesViewModel?
@@ -19,7 +19,7 @@ final class LaunchesDataSource: NSObject, UITableViewDataSource {
     }
     
     func registerCells() {
-        tableview.register(cellType: LaunchTableViewCell.self)
+        tableview.register(cellType: BaseDetailTableViewCell.self)
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -31,10 +31,19 @@ final class LaunchesDataSource: NSObject, UITableViewDataSource {
             return UITableViewCell()
         }
         
-        let cell: LaunchTableViewCell = tableView.dequeueReusableCell(for: indexPath)
-        cell.configureWith(model: launch)
+        let cell: BaseDetailTableViewCell = tableView.dequeueReusableCell(for: indexPath)
+        cell.configureWith(title: launch.name, image: launch.links.patch?.large ?? "")
         cell.selectionStyle = .none
         
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
+        guard let dragons = viewModel?.model.value else { return }
+        
+        let lastIndex = dragons.count - 1
+        if indexPaths.contains(where: { $0.row >= lastIndex }) {
+            viewModel?.fetchNextPage()
+        }
     }
 }

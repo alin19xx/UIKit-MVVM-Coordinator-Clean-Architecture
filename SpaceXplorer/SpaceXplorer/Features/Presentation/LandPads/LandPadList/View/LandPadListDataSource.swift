@@ -19,11 +19,11 @@ final class LandPadListDataSource: NSObject, UITableViewDataSource {
     }
     
     func registerCells() {
-        tableview.register(cellType: LandPadTableViewCell.self)
+        tableview.register(cellType: BaseDetailTableViewCell.self)
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel?.model.value?.count ?? 0 // Usar `model` en lugar de `allLaunches`
+        return viewModel?.model.value?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -31,8 +31,8 @@ final class LandPadListDataSource: NSObject, UITableViewDataSource {
             return UITableViewCell()
         }
         
-        let cell: LandPadTableViewCell = tableView.dequeueReusableCell(for: indexPath)
-        cell.configureWith(model: landPad)
+        let cell: BaseDetailTableViewCell = tableView.dequeueReusableCell(for: indexPath)
+        cell.configureWith(title: landPad.name, image: landPad.images[0])
         cell.selectionStyle = .none
         
         return cell

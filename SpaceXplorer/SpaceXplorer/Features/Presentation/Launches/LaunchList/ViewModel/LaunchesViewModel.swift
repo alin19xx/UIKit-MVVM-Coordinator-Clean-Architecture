@@ -15,7 +15,6 @@ enum LaunchFilterType {
 
 @MainActor
 protocol LaunchesViewModelInput {
-    var allLaunches: Box<[LaunchModel]> { get }
     func viewDidLoad()
 }
 
@@ -26,7 +25,7 @@ protocol LaunchesViewModelOuput {
     var showErrorAlert: Box<Bool?> { get set }
     var useCase: LaunchesUseCase { get }
     
-    func filterLaunches(type: LaunchFilterType)
+    func fetchNextPage()
 }
 
 @MainActor
@@ -36,47 +35,58 @@ protocol LaunchesViewModel: LaunchesViewModelInput, LaunchesViewModelOuput {}
 final class DefaultLaunchesViewModel: BaseViewModel, LaunchesViewModel {
     
     var model: Box<[LaunchModel]?> = Box(nil)
-    var allLaunches: Box<[LaunchModel]> = Box([])
     var selectedLaunch: Box<LaunchModel?> = Box(nil)
     var showErrorAlert: Box<Bool?> = Box(nil)
     
     var useCase: LaunchesUseCase
-    
+    private var isFetching: Bool = false
+    private var isFirstLoad: Bool = true
+
     init(useCase: LaunchesUseCase = DefaultLaunchesUseCase()) {
         self.useCase = useCase
     }
     
     func viewDidLoad() {
-        fetchAllLaunches()
+        reloadData()
     }
     
-    func filterLaunches(type: LaunchFilterType) {
-        let filteredLaunches = applyFilter(type: type)
-        model.value = filteredLaunches
+    func reloadData() {
+        useCase.resetPagination()
+        model.value = nil
+        isFirstLoad = true
+        fetchNextPage()
     }
     
-    private func fetchAllLaunches() {
-        showLoading()
+    func fetchNextPage() {
+        guard !isFetching else { return }
+        isFetching = true
+        
+        if isFirstLoad {
+            showLoading()
+        }
+        
         Task {
-            defer { hideLoading() }
+            defer {
+                isFetching = false
+                if isFirstLoad {
+                    hideLoading()
+                    isFirstLoad = false
+                }
+            }
+            
             do {
-                let launches = try await useCase.execute()
-                allLaunches.value = launches.map { LaunchModel(from: $0) }
-                model.value = allLaunches.value
+                let pageEntity = try await useCase.execute(limit: 10)
+                let pageModel = PageModel(from: pageEntity)
+                
+                if var currentModel = model.value {
+                    currentModel.append(contentsOf: pageModel.items.map { LaunchModel(from: $0) })
+                    model.value = currentModel
+                } else {
+                    model.value = pageModel.items.map { LaunchModel(from: $0) }
+                }
             } catch {
                 showErrorAlert.value = true
             }
-        }
-    }
-    
-    private func applyFilter(type: LaunchFilterType) -> [LaunchModel] {
-        switch type {
-        case .all:
-            return allLaunches.value
-        case .past:
-            return allLaunches.value.filter { !$0.isUpcoming }
-        case .upcoming:
-            return allLaunches.value.filter { $0.isUpcoming }
         }
     }
 }

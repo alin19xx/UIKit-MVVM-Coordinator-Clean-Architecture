@@ -136,3 +136,8 @@ struct PayloadWeightDecodable: Decodable {
     let kg: Int
     let lb: Int
 }
+
+struct MassDecodable: Decodable {
+    let kg: Int
+    let lb: Int
+}

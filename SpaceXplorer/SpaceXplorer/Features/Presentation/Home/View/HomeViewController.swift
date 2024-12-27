@@ -56,9 +56,7 @@ class HomeViewController: UIViewController {
 
     private func setupView() {
         view.addSubview(tableView)
-        
         setupTableView()
-        
         setupConstraints()
     }
     

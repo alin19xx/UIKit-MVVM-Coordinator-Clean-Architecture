@@ -19,7 +19,7 @@ final class HomeDataSource: NSObject, UITableViewDataSource {
     }
     
     func registerCells() {
-        tableview.register(cellType: HomeTableViewCell.self)
+        tableview.register(cellType: BaseTableViewCell.self)
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -31,8 +31,12 @@ final class HomeDataSource: NSObject, UITableViewDataSource {
         let sections = viewModel?.sections.value
         
         if let section = sections?[indexPath.row] as? HomeSection {
-            let cell: HomeTableViewCell = tableView.dequeueReusableCell(for: indexPath)
-            cell.configureWith(model: section)
+            let cell: BaseTableViewCell = tableView.dequeueReusableCell(for: indexPath)
+            cell.configureWith(
+                title: section.title,
+                description: section.subtitle,
+                imageURL: section.icon
+            )
             cell.selectionStyle = .none
             
             return cell

@@ -8,7 +8,7 @@
 import Foundation
 
 protocol LaunchesRepository {
-    func fetchLaunches() async throws -> [LaunchDecodable]
+    func fetchLaunches(limit: Int, offset: Int) async throws -> PageResponse<LaunchDecodable>
 }
 
 final class DefaultLaunchesRepository: LaunchesRepository {
@@ -18,8 +18,9 @@ final class DefaultLaunchesRepository: LaunchesRepository {
         self.networkService = networkService
     }
 
-    func fetchLaunches() async throws -> [LaunchDecodable] {
-        let endpoint = SpaceXEndpoint.launches
-        return try await networkService.request(endpoint: endpoint)
+    func fetchLaunches(limit: Int, offset: Int) async throws -> PageResponse<LaunchDecodable> {
+        let endpoint = SpaceXEndpoint.launches(limit: limit, offset: offset)
+        let response: PageResponse<LaunchDecodable> = try await networkService.request(endpoint: endpoint)
+        return response
     }
 }

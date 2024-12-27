@@ -40,16 +40,16 @@ final class MainCoordinator: NSObject, Coordinator {
             rocketsVC.mainCoordinator = self
             
             self.navigationController.pushViewController(rocketsVC, animated: true)
-        case .dragons:
-            let dragonsVC = DragonListViewController(viewModel: DefaultDragonListViewModel())
-            dragonsVC.mainCoordinator = self
-            
-            self.navigationController.pushViewController(dragonsVC, animated: true)
         case .landpads:
             let landpadsVC = LandPadListViewController(viewModel: DefaultLandPadListViewModel())
             landpadsVC.mainCoordinator = self
             
             self.navigationController.pushViewController(landpadsVC, animated: true)
+        case .starlink:
+            let starlinkVC = StarlinkMapViewController(viewModel: DefaultStarlinkMapViewModel())
+            starlinkVC.mainCoordinator = self
+            
+            self.navigationController.pushViewController(starlinkVC, animated: true)
         }
     }
     
@@ -63,13 +63,6 @@ final class MainCoordinator: NSObject, Coordinator {
     
     func navigateToDetails(for rocket: RocketModel) {
         let detailVC = RocketDetailViewController(rocket: rocket)
-        detailVC.mainCoordinator = self
-        
-        self.navigationController.pushViewController(detailVC, animated: true)
-    }
-    
-    func navigateToDetails(for dragon: DragonModel) {
-        let detailVC = DragonDetailViewController(dragon: dragon)
         detailVC.mainCoordinator = self
         
         self.navigationController.pushViewController(detailVC, animated: true)

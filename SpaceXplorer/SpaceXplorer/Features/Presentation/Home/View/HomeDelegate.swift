@@ -17,7 +17,8 @@ final class HomeDelegate: NSObject, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 100
+        // TODO: Needs to be refactored
+        return UIScreen.main.bounds.height * 0.19
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

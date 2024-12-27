@@ -24,14 +24,10 @@ struct LaunchEntity {
         let wikipediaURL: String?
     }
 
-    init(from decodable: LaunchDecodable) throws {
-        guard let date = LaunchEntity.parseDate(decodable.dateUTC) else {
-            throw NSError(domain: "Invalid date format", code: 0, userInfo: nil)
-        }
-
+    init(from decodable: LaunchDecodable) {
         self.id = decodable.id
         self.name = decodable.name
-        self.date = date
+        self.date = LaunchEntity.parseDate(decodable.dateUTC) ?? .now
         self.details = decodable.details
         self.links = LaunchLinksEntity(
             patchSmall: decodable.links.patch?.small,

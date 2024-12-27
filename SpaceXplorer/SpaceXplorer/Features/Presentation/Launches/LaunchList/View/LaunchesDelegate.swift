@@ -21,7 +21,7 @@ final class LaunchesDelegate: NSObject, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let selectedLaunch = viewModel?.allLaunches.value[indexPath.row] {
+        if let selectedLaunch = viewModel?.model.value?[indexPath.row] {
             viewModel?.selectedLaunch.value = selectedLaunch
         }
     }

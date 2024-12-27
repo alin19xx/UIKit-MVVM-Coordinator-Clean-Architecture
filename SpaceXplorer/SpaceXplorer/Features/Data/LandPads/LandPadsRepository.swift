@@ -8,7 +8,7 @@
 import Foundation
 
 protocol LandPadsRepository {
-    func fetchLandPads() async throws -> [LandPadDecodable]
+    func fetchLandPads(limit: Int, offset: Int) async throws -> PageResponse<LandPadDecodable>
 }
 
 final class DefaultLandPadsRepository: LandPadsRepository {
@@ -18,8 +18,9 @@ final class DefaultLandPadsRepository: LandPadsRepository {
         self.networkService = networkService
     }
 
-    func fetchLandPads() async throws -> [LandPadDecodable] {
-        let endpoint = SpaceXEndpoint.landpads
-        return try await networkService.request(endpoint: endpoint)
+    func fetchLandPads(limit: Int, offset: Int) async throws -> PageResponse<LandPadDecodable> {
+        let endpoint = SpaceXEndpoint.landpads(limit: limit, offset: offset)
+        let response: PageResponse<LandPadDecodable> = try await networkService.request(endpoint: endpoint)
+        return response
     }
 }

@@ -140,7 +140,7 @@ class LandPadDetailViewController: UIViewController {
     // MARK: - View Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .black
+        view.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .white
         
         setupUI()
         configureWithModel()

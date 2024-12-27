@@ -8,21 +8,46 @@
 import Foundation
 
 enum SpaceXEndpoint: Endpoint {
-    case launches
+    case launches(limit: Int?, offset: Int?)
     case rockets
-    case dragons
-    case landpads
+    case landpads(limit: Int?, offset: Int?)
+    case starlink
 
     var path: String {
         switch self {
-        case .launches: return "/v4/launches"
+        case .launches: return "/v4/launches/query"
         case .rockets: return "/v4/rockets"
-        case .dragons: return "/v4/dragons"
-        case .landpads: return "/v4/landpads"
+        case .landpads: return "/v4/landpads/query"
+        case .starlink: return "/v4/starlink"
+        }
+    }
+
+    var method: HttpMethod {
+        switch self {
+            case .launches, .landpads:
+                return .post
+            case .starlink, .rockets:
+                return .get
         }
     }
 
     var queryItems: [URLQueryItem] { [] }
-    var method: HttpMethod { .get }
-    var bodyParameters: Data? { nil }
+
+    var bodyParameters: Data? {
+        switch self {
+        case .launches(let limit, let offset),
+             .landpads(let limit, let offset):
+            let requestBody = [
+                "query": [:],
+                "options": [
+                    "limit": limit ?? 10,
+                    "offset": offset ?? 0
+                ]
+            ]
+            return try? JSONSerialization.data(withJSONObject: requestBody)
+
+        case .starlink, .rockets:
+            return nil
+        }
+    }
 }
