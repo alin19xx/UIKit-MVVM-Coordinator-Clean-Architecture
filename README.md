@@ -23,25 +23,37 @@ The goal of this project is to demonstrate how to build a **modular**, **scalabl
 ## 🗂 Project Structure
 
 ```plaintext
-UIKit-MVVM-Coordinator-Clean-Architecture
-├── Networking/
-│   ├── NetworkClient.swift
-│   ├── Endpoint.swift
-│   └── SpaceXEndpoint.swift
-├── Data/
-│   ├── Repositories/
-│   ├── Decodable Models/
-│   └── Pagination/
-├── Domain/
-│   ├── UseCases/
-│   └── Entities/
-├── Presentation/
-│   ├── Coordinators/
-│   ├── ViewModels/
-│   ├── Views/
-│   └── Base/
-├── Resources/
-│   └── Assets.xcassets
+SpaceXplorer/
+├── Features/
+│   ├── Data/
+│   │   ├── Endpoints/
+│   │   │   └── SpaceXEndpoint.swift
+│   │   └── {FeatureName}/
+│   │       ├── Decodables/
+│   │       │   └── {FeatureName}Decodable.swift
+│   │       └── Repositories/
+│   │           └── {FeatureName}Repository.swift
+│   │       
+│   ├── Domain/
+│   │   └── {FeatureName}/
+│   │       ├── Entities/
+│   │       │   └── {FeatureName}Entity.swift
+│   │       └── UseCases/
+│   │           └── {FeatureName}UseCase.swift
+│   └──  Presentation/
+│       ├── Base/
+│       ├── Coordinator/
+│       │   └── MainCoordinator.swift
+│       └── {FeatureName}/
+│           ├── View/
+│           ├── ViewModel/
+│           └── Model/
+└── Utils/
+    ├── Extensions/
+    ├── Logger/
+    ├── Network/
+    └── Boxing/
+
 ```
 
 ### Layers Explanation:
@@ -133,7 +145,6 @@ name.value = "New Value"
 ## 🚧 To Do:
 - Add error handling properly
 - Add proper **unit tests** to ensure code reliability.
-- Refactor **pagination logic** for better readability and caching.
 - Improve **data caching** strategies for better performance.
 - Add more **UI-specific logs** to track user interactions.
 - Enhance **map views** with better visuals and interactivity.
