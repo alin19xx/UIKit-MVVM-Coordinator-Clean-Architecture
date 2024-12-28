@@ -82,12 +82,12 @@ let launches: [LaunchModel] = try await networkClient.request(endpoint: SpaceXEn
 ```
 
 ### 2. Pagination
-The project supports dynamic pagination with caching and offset handling, implemented in the **Use Case Layer**. However, the current implementation could be improved and refactored for better performance.
+The project supports efficient pagination, implemented in the **Use Case Layer**. This ensures smooth data loading while reducing redundant API calls.
 
-Example:
-```swift
-let landPadsPage = try await landPadsUseCase.execute(limit: 10)
-```
+#### How It Works:
+- **State Management**: The `ViewModel` tracks the current state (e.g., loading, idle, or error) to control when data should be fetched.
+- **Caching**: Data from previous pages is stored to avoid fetching the same information multiple times.
+- **Offset Calculation**: Dynamically calculates the offset to load the next set of data.
 
 ### 3. Base Classes
 Reusable base classes are implemented to standardize common functionalities:
