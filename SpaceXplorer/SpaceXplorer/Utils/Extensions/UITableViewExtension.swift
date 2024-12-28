@@ -5,7 +5,6 @@
 //  Created by Alex Lin Segarra on 17/12/24.
 //
 
-import Foundation
 import UIKit
 
 protocol ReusableCell: AnyObject {

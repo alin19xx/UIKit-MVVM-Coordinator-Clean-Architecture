@@ -32,7 +32,7 @@ final class DefaultLandPadListViewModel: BaseViewModel, LandPadListViewModel {
     
     var useCase: LandPadsUseCase
     private var isFetching: Bool = false
-    private var isFirstLoad: Bool = true // Nuevo estado para diferenciar la primera carga
+    private var isFirstLoad: Bool = true
 
     init(useCase: LandPadsUseCase = DefaultLandPadsUseCase()) {
         self.useCase = useCase
@@ -45,7 +45,7 @@ final class DefaultLandPadListViewModel: BaseViewModel, LandPadListViewModel {
     func reloadData() {
         useCase.resetPagination()
         model.value = nil
-        isFirstLoad = true // Reiniciar el estado al recargar
+        isFirstLoad = true
         fetchLandpads()
     }
     
@@ -53,7 +53,6 @@ final class DefaultLandPadListViewModel: BaseViewModel, LandPadListViewModel {
         guard !isFetching else { return }
         isFetching = true
         
-        // Mostrar el spinner solo durante la primera carga
         if isFirstLoad {
             showLoading()
         }
@@ -63,7 +62,7 @@ final class DefaultLandPadListViewModel: BaseViewModel, LandPadListViewModel {
                 isFetching = false
                 if isFirstLoad {
                     hideLoading()
-                    isFirstLoad = false // Cambiar el estado después de la primera carga
+                    isFirstLoad = false
                 }
             }
             
@@ -71,7 +70,6 @@ final class DefaultLandPadListViewModel: BaseViewModel, LandPadListViewModel {
                 let pageEntity = try await useCase.execute(limit: 10)
                 let pageModel = PageModel(from: pageEntity)
                 
-                // Añadir los nuevos elementos al modelo existente
                 if var currentModels = model.value {
                     currentModels.append(contentsOf: pageModel.items.map { LandPadModel(from: $0) })
                     model.value = currentModels

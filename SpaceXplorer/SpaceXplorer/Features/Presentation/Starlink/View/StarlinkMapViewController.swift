@@ -31,15 +31,19 @@ class StarlinkMapViewController: BaseViewController<DefaultStarlinkMapViewModel>
         view.addSubview(mapView)
         mapView.delegate = self
         
+        mapView.mapType = .mutedStandard
+        mapView.isPitchEnabled = true
+        mapView.isRotateEnabled = true
+        mapView.showsBuildings = false
+        
         let initialLocation = CLLocationCoordinate2D(latitude: 0, longitude: 0)
         let camera = MKMapCamera(
             lookingAtCenter: initialLocation,
-            fromDistance: 10000000,
-            pitch: 60,
+            fromDistance: 50000000,
+            pitch: 45,
             heading: 0
         )
         mapView.setCamera(camera, animated: false)
-        mapView.showsBuildings = true
 
         NSLayoutConstraint.activate([
             mapView.topAnchor.constraint(equalTo: view.topAnchor),

@@ -23,7 +23,6 @@ class LandPadDetailViewController: UIViewController {
     private let modalView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .white
         view.layer.cornerRadius = 16
         view.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         view.layer.shadowColor = UIColor.black.cgColor
@@ -140,7 +139,6 @@ class LandPadDetailViewController: UIViewController {
     // MARK: - View Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .white
         
         setupUI()
         configureWithModel()
@@ -159,6 +157,7 @@ class LandPadDetailViewController: UIViewController {
 
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
         modalView.addGestureRecognizer(panGesture)
+        modalView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .white
         
         updateModalContent(for: collapsedHeight)
     }
