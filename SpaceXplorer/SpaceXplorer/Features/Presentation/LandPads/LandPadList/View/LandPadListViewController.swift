@@ -51,6 +51,12 @@ class LandPadListViewController: BaseViewController<DefaultLandPadListViewModel>
             
             self.mainCoordinator?.navigateToDetails(for: landPad)
         }
+        
+        viewModel.viewModelState.bind { [weak self] state in
+            guard let self = self else { return }
+            
+            viewModel.handleStateChange(state)
+        }
     }
 
     private func setupView() {
@@ -63,6 +69,7 @@ class LandPadListViewController: BaseViewController<DefaultLandPadListViewModel>
     private func setupTableView() {
         tableView.delegate = delegate
         tableView.dataSource = dataSource
+        tableView.prefetchDataSource = dataSource
         
         dataSource.registerCells()
     }

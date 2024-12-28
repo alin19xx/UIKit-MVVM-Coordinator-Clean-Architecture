@@ -27,15 +27,14 @@ class BaseViewController<ViewModel: BaseViewModelProtocol>: UIViewController {
         view.isHidden = true
         return view
     }()
-
+    
     private let loadingSpinner: UIActivityIndicatorView = {
         let spinner = UIActivityIndicatorView(style: .large)
         spinner.translatesAutoresizingMaskIntoConstraints = false
         spinner.hidesWhenStopped = true
         return spinner
     }()
-
-    // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
@@ -58,53 +57,63 @@ class BaseViewController<ViewModel: BaseViewModelProtocol>: UIViewController {
             }
         }
     }
-
+    
+    
     // MARK: - Setup Methods
+    
     private func setupView() {
         view.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .white
     }
-
+    
     private func setupSpinnerOverlay() {
         view.addSubview(overlayView)
         overlayView.addSubview(loadingSpinner)
-
+        
         NSLayoutConstraint.activate([
             overlayView.topAnchor.constraint(equalTo: view.topAnchor),
             overlayView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             overlayView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             overlayView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-
+            
             loadingSpinner.centerXAnchor.constraint(equalTo: overlayView.centerXAnchor),
             loadingSpinner.centerYAnchor.constraint(equalTo: overlayView.centerYAnchor)
         ])
     }
-
+    
+    
     // MARK: - Spinner Control
+    
     func showLoadingSpinner() {
         DispatchQueue.main.async {
             self.overlayView.isHidden = false
             self.loadingSpinner.startAnimating()
         }
     }
-
+    
     func hideLoadingSpinner() {
         DispatchQueue.main.async {
             self.overlayView.isHidden = true
             self.loadingSpinner.stopAnimating()
         }
     }
-
+    
+    
     // MARK: - Dark/Light Mode Support
+    
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         guard traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) else { return }
         updateAppearanceForCurrentMode()
     }
-
+    
     private func updateAppearanceForCurrentMode() {
         view.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .white
     }
+}
 
-    // MARK: - Error or Toast (wip)
+
+// MARK: - Toast (wip)
+extension BaseViewController {
+    
     func showErrorToast(message: String) {
         let toastLabel = UILabel()
         toastLabel.text = message

@@ -17,7 +17,9 @@ protocol LandPadListViewModelOuput {
     var model: Box<[LandPadModel]?> { get }
     var selectedLandPad: Box<LandPadModel?> { get }
     var showErrorAlert: Box<Bool?> { get set }
-    var useCase: LandPadsUseCase { get }
+    var useCase: LandPadUseCase { get }
+    
+    func fetchNextPage()
 }
 
 @MainActor
@@ -25,60 +27,62 @@ protocol LandPadListViewModel: LandPadListViewModelInput, LandPadListViewModelOu
 
 @MainActor
 final class DefaultLandPadListViewModel: BaseViewModel, LandPadListViewModel {
-    
+    var viewModelState: Box<ViewModelState> = Box(.idle)
     var model: Box<[LandPadModel]?> = Box(nil)
     var selectedLandPad: Box<LandPadModel?> = Box(nil)
     var showErrorAlert: Box<Bool?> = Box(nil)
     
-    var useCase: LandPadsUseCase
-    private var isFetching: Bool = false
-    private var isFirstLoad: Bool = true
+    var useCase: LandPadUseCase
 
-    init(useCase: LandPadsUseCase = DefaultLandPadsUseCase()) {
+    init(useCase: LandPadUseCase = DefaultLandPadUseCase()) {
         self.useCase = useCase
     }
-    
+
     func viewDidLoad() {
         reloadData()
     }
-    
+
     func reloadData() {
-        useCase.resetPagination()
-        model.value = nil
-        isFirstLoad = true
-        fetchLandpads()
+        model.value = []
+        fetchNextPage()
     }
     
-    func fetchLandpads() {
-        guard !isFetching else { return }
-        isFetching = true
-        
-        if isFirstLoad {
-            showLoading()
-        }
+    func fetchNextPage() {
+        guard canFetchNextPage() else { return }
+        viewModelState.value = viewModelState.value == .idle ? .loadingFirstPage : .loadingMore
         
         Task {
-            defer {
-                isFetching = false
-                if isFirstLoad {
-                    hideLoading()
-                    isFirstLoad = false
-                }
-            }
-            
             do {
-                let pageEntity = try await useCase.execute(limit: 10)
-                let pageModel = PageModel(from: pageEntity)
+                let page = try await useCase.execute(limit: 10)
+                model.value?.append(contentsOf: page.items.map { LandPadModel(from: $0) })
                 
-                if var currentModels = model.value {
-                    currentModels.append(contentsOf: pageModel.items.map { LandPadModel(from: $0) })
-                    model.value = currentModels
-                } else {
-                    model.value = pageModel.items.map { LandPadModel(from: $0) }
-                }
+                viewModelState.value = page.hasMorePages ? .loaded : .idle
             } catch {
+                viewModelState.value = .error("Failed to load launches.")
                 showErrorAlert.value = true
             }
+        }
+    }
+    
+    func handleStateChange(_ state: ViewModelState) {
+        switch state {
+        case .loadingFirstPage:
+            showLoading()
+        case .loaded, .idle:
+            hideLoading()
+        case .loadingMore:
+            break
+        case .error:
+            hideLoading()
+        }
+    }
+    
+    private func canFetchNextPage() -> Bool {
+        switch viewModelState.value {
+        case .loadingFirstPage, .loadingMore:
+            return false
+        default:
+            return true
         }
     }
 }

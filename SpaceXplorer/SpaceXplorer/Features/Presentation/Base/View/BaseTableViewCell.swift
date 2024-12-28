@@ -44,7 +44,17 @@ class BaseTableViewCell: UITableViewCell, ReusableCell {
     
     private var currentImageURL: URL?
     
-    // MARK: - Configure Method
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        backgroundImageView.image = nil
+        currentImageURL = nil
+    }
+}
+
+
+// MARK: - Public Methods
+
+extension BaseTableViewCell {
     func configureWith(title: String, description: String? = nil, imageURL: String? = nil) {
         self.titleLabel.text = title
         self.descriptionLabel.text = description
@@ -57,37 +67,18 @@ class BaseTableViewCell: UITableViewCell, ReusableCell {
         
         setupView()
     }
-    
-    // MARK: - Private Setup Methods
+}
+
+
+// MARK: - Private Methods
+
+extension BaseTableViewCell {
     private func setupView() {
         contentView.addSubview(backgroundImageView)
         contentView.addSubview(overlayView)
         contentView.addSubview(titleLabel)
         contentView.addSubview(descriptionLabel)
         setupConstraints()
-    }
-    
-    private func setupConstraints() {
-        NSLayoutConstraint.activate([
-            backgroundImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            backgroundImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-            backgroundImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            backgroundImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            
-            overlayView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            overlayView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-            overlayView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            overlayView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
-            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            
-            descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
-            descriptionLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            descriptionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            descriptionLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -16)
-        ])
     }
     
     private func fetchRemoteImage(with url: URL) {
@@ -114,15 +105,36 @@ class BaseTableViewCell: UITableViewCell, ReusableCell {
         task.resume()
     }
     
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        backgroundImageView.image = nil
-        currentImageURL = nil
-    }
-    
     private func applyImageWithAnimation(image: UIImage) {
         UIView.transition(with: self.backgroundImageView, duration: 0.3, options: .transitionCrossDissolve, animations: {
             self.backgroundImageView.image = image
         }, completion: nil)
+    }
+}
+
+
+// MARK: - Constraints
+extension BaseTableViewCell {
+    private func setupConstraints() {
+        NSLayoutConstraint.activate([
+            backgroundImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            backgroundImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            backgroundImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            backgroundImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            
+            overlayView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            overlayView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            overlayView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            overlayView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            
+            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
+            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            
+            descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
+            descriptionLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            descriptionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            descriptionLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -16)
+        ])
     }
 }

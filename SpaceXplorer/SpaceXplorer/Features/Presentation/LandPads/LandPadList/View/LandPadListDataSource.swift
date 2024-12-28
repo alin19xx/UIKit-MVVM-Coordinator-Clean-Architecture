@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-final class LandPadListDataSource: NSObject, UITableViewDataSource {
+final class LandPadListDataSource: NSObject, UITableViewDataSource, UITableViewDataSourcePrefetching {
     
     private let tableview: UITableView
     private var viewModel: LandPadListViewModel?
@@ -36,5 +36,14 @@ final class LandPadListDataSource: NSObject, UITableViewDataSource {
         cell.selectionStyle = .none
         
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
+        guard let landPads = viewModel?.model.value else { return }
+        
+        let lastIndex = landPads.count - 1
+        if indexPaths.contains(where: { $0.row >= lastIndex }) {
+            viewModel?.fetchNextPage()
+        }
     }
 }

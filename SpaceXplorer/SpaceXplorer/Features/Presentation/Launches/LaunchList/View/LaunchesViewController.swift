@@ -49,6 +49,12 @@ class LaunchesViewController: BaseViewController<DefaultLaunchesViewModel> {
             
             self.mainCoordinator?.navigateToDetails(for: launch)
         }
+        
+        viewModel.viewModelState.bind { [weak self] state in
+            guard let self = self else { return }
+            
+            viewModel.handleStateChange(state)
+        }
     }
 
     private func setupView() {

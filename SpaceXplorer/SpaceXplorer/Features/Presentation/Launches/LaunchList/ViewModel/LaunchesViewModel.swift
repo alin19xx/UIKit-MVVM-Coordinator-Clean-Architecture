@@ -22,6 +22,7 @@ protocol LaunchesViewModelInput {
 protocol LaunchesViewModelOuput {
     var model: Box<[LaunchModel]?> { get }
     var selectedLaunch: Box<LaunchModel?> { get }
+    var viewModelState: Box<ViewModelState> { get }
     var showErrorAlert: Box<Bool?> { get set }
     var useCase: LaunchesUseCase { get }
     
@@ -33,60 +34,62 @@ protocol LaunchesViewModel: LaunchesViewModelInput, LaunchesViewModelOuput {}
 
 @MainActor
 final class DefaultLaunchesViewModel: BaseViewModel, LaunchesViewModel {
-    
+    var viewModelState: Box<ViewModelState> = Box(.idle)
     var model: Box<[LaunchModel]?> = Box(nil)
     var selectedLaunch: Box<LaunchModel?> = Box(nil)
     var showErrorAlert: Box<Bool?> = Box(nil)
     
     var useCase: LaunchesUseCase
-    private var isFetching: Bool = false
-    private var isFirstLoad: Bool = true
 
     init(useCase: LaunchesUseCase = DefaultLaunchesUseCase()) {
         self.useCase = useCase
     }
-    
+
     func viewDidLoad() {
         reloadData()
     }
-    
+
     func reloadData() {
-        useCase.resetPagination()
-        model.value = nil
-        isFirstLoad = true
+        model.value = []
         fetchNextPage()
     }
     
     func fetchNextPage() {
-        guard !isFetching else { return }
-        isFetching = true
-        
-        if isFirstLoad {
-            showLoading()
-        }
+        guard canFetchNextPage() else { return }
+        viewModelState.value = viewModelState.value == .idle ? .loadingFirstPage : .loadingMore
         
         Task {
-            defer {
-                isFetching = false
-                if isFirstLoad {
-                    hideLoading()
-                    isFirstLoad = false
-                }
-            }
-            
             do {
-                let pageEntity = try await useCase.execute(limit: 10)
-                let pageModel = PageModel(from: pageEntity)
+                let page = try await useCase.execute(limit: 10)
+                model.value?.append(contentsOf: page.items.map { LaunchModel(from: $0) })
                 
-                if var currentModel = model.value {
-                    currentModel.append(contentsOf: pageModel.items.map { LaunchModel(from: $0) })
-                    model.value = currentModel
-                } else {
-                    model.value = pageModel.items.map { LaunchModel(from: $0) }
-                }
+                viewModelState.value = page.hasMorePages ? .loaded : .idle
             } catch {
+                viewModelState.value = .error("Failed to load launches.")
                 showErrorAlert.value = true
             }
+        }
+    }
+    
+    func handleStateChange(_ state: ViewModelState) {
+        switch state {
+        case .loadingFirstPage:
+            showLoading()
+        case .loaded, .idle:
+            hideLoading()
+        case .loadingMore:
+            break
+        case .error:
+            hideLoading()
+        }
+    }
+    
+    private func canFetchNextPage() -> Bool {
+        switch viewModelState.value {
+        case .loadingFirstPage, .loadingMore:
+            return false
+        default:
+            return true
         }
     }
 }
