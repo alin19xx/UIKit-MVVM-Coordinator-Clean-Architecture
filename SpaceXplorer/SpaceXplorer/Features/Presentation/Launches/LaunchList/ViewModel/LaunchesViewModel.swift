@@ -63,7 +63,7 @@ final class DefaultLaunchesViewModel: BaseViewModel, LaunchesViewModel {
                 let page = try await useCase.execute(limit: 10)
                 model.value?.append(contentsOf: page.items.map { LaunchModel(from: $0) })
                 
-                viewModelState.value = page.hasMorePages ? .loaded : .idle
+                viewModelState.value = page.hasNextPage ? .loaded : .idle
             } catch {
                 viewModelState.value = .error("Failed to load launches.")
                 showErrorAlert.value = true

@@ -12,4 +12,6 @@ struct PageResponse<T: Decodable>: Decodable {
     let totalDocs: Int
     let limit: Int
     let offset: Int
+    let hasNextPage: Bool
+    let hasPrevPage: Bool
 }

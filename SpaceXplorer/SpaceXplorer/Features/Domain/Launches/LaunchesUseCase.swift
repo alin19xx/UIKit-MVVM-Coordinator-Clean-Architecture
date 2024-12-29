@@ -17,46 +17,47 @@ protocol LaunchesUseCase {
     ///
     /// - Throws: An error if the data fetching fails
     func execute(limit: Int) async throws -> Page<LaunchEntity>
-    
-    /// Resets the pagination state to its initial values.
-    ///
-    /// Call this method to clear cached data and restart pagination from the beginning.
-    func resetPagination()
 }
 
 final class DefaultLaunchesUseCase: LaunchesUseCase {
     private let repository: LaunchesRepository
     private var currentPage: Page<LaunchEntity>?
-    
+
     init(repository: LaunchesRepository = DefaultLaunchesRepository()) {
         self.repository = repository
     }
 
     func execute(limit: Int) async throws -> Page<LaunchEntity> {
         let offset = currentPage?.offset ?? 0
-        let hasMorePages = currentPage?.hasMorePages ?? true
-        
+        let hasMorePages = currentPage?.hasNextPage ?? true
+
         // If no more pages, return the current data or an empty page
         guard hasMorePages else {
-            return currentPage ?? Page(items: [],
-                                       totalItems: 0,
-                                       limit: limit,
-                                       offset: offset)
+            return Page(
+                items: [],
+                totalItems: 0,
+                limit: limit,
+                offset: offset,
+                hasNextPage: false,
+                hasPrevPage: false
+            )
         }
-        
+
         let pageResponse = try await repository.fetchLaunches(limit: limit, offset: offset)
         
         // Create a new page with the fetched data
         let newPage = Page(
             items: pageResponse.docs.map { LaunchEntity(from: $0) },
             totalItems: pageResponse.totalDocs,
-            limit: limit,
-            offset: offset + pageResponse.docs.count
+            limit: pageResponse.limit,
+            offset: pageResponse.offset + pageResponse.docs.count,
+            hasNextPage: pageResponse.hasNextPage,
+            hasPrevPage: pageResponse.hasPrevPage
         )
         
         // Merge the new data with the existing data
         currentPage = currentPage?.merging(with: newPage) ?? newPage
-        
+
         return newPage
     }
 
